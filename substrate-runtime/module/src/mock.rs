@@ -53,7 +53,7 @@ parameter_types! {
 	pub const AvailableBlockRatio: Perbill = Perbill::one();
 }
 
-impl frame_system::Trait for TestRuntime {
+impl frame_system::Config for TestRuntime {
 	type Origin = Origin;
 	type Index = u64;
 	type BlockNumber = u64;
@@ -83,7 +83,7 @@ parameter_types! {
 	pub const TransactionByteFee: u64 = 0;
 }
 
-impl pallet_balances::Trait for TestRuntime {
+impl pallet_balances::Config for TestRuntime {
 	type Balance = u64;
 	type Event = TestEvent;
 	type DustRemoval = ();
@@ -91,7 +91,7 @@ impl pallet_balances::Trait for TestRuntime {
 	type AccountStore = frame_system::Module<TestRuntime>;
 }
 
-impl Trait for TestRuntime {
+impl Config for TestRuntime {
 	type Event = TestEvent;
 	type Currency = pallet_balances::Module<Self>;
 }

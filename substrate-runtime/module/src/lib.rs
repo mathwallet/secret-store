@@ -48,19 +48,19 @@ use server_key_generation::{ServerKeyGenerationRequest, ServerKeyGenerationServi
 use server_key_retrieval::{ServerKeyRetrievalRequest, ServerKeyRetrievalService};
 use key_server_set_storage::KeyServer;
 
-pub type BalanceOf<T> = <<T as Trait>::Currency as Currency<<T as frame_system::Trait>::AccountId>>::Balance;
+pub type BalanceOf<T> = <<T as Config>::Currency as Currency<<T as frame_system::Config>::AccountId>>::Balance;
 
 /// The module configuration trait
-pub trait Trait: frame_system::Trait {
+pub trait Config: frame_system::Config {
 	/// They overarching event type.
-	type Event: From<Event> + Into<<Self as frame_system::Trait>::Event>;
+	type Event: From<Event> + Into<<Self as frame_system::Config>::Event>;
 
 	/// The currency type used for paying services.
 	type Currency: Currency<Self::AccountId>;
 }
 
 decl_module! {
-	pub struct Module<T: Trait> for enum Call where origin: T::Origin {
+	pub struct Module<T: Config> for enum Call where origin: T::Origin {
 		fn deposit_event() = default;
 
 		/// Change key server set owner.
@@ -358,7 +358,7 @@ decl_event!(
 );
 
 decl_storage! {
-	trait Store for Module<T: Trait> as SecretStore {
+	trait Store for Module<T: Config> as SecretStore {
 		/// Owner can perform some actions that are unavailable to regular users.
 		/// https://github.com/paritytech/secret-store/issues/30
 		pub Owner get(owner) config(): T::AccountId;
@@ -374,7 +374,7 @@ decl_storage! {
 		/// is required.
 		IsInitialized: bool;
 		/// Number of block where last changes have been applied to **current** key server set.
-		CurrentSetChangeBlock: <T as frame_system::Trait>::BlockNumber;
+		CurrentSetChangeBlock: <T as frame_system::Config>::BlockNumber;
 
 		/// Current key servers set. This is the set of key servers that are running key server
 		/// operations at this moment.
@@ -406,7 +406,7 @@ decl_storage! {
 		ServerKeyGenerationRequestsKeys: Vec<ServerKeyId>;
 		/// All active server key generation requests.
 		ServerKeyGenerationRequests: map hasher(blake2_128_concat) ServerKeyId
-			=> Option<ServerKeyGenerationRequest<<T as frame_system::Trait>::BlockNumber>>;
+			=> Option<ServerKeyGenerationRequest<<T as frame_system::Config>::BlockNumber>>;
 		/// Reported server keys.
 		ServerKeyGenerationResponses: double_map
 			hasher(blake2_128_concat) ServerKeyId,
@@ -420,7 +420,7 @@ decl_storage! {
 		/// All active server key retrieval requests.
 		ServerKeyRetrievalRequests: map
 			hasher(blake2_128_concat) ServerKeyId
-			=> Option<ServerKeyRetrievalRequest<<T as frame_system::Trait>::BlockNumber>>;
+			=> Option<ServerKeyRetrievalRequest<<T as frame_system::Config>::BlockNumber>>;
 		/// Reported server keys.
 		ServerKeyRetrievalResponses: double_map
 			hasher(blake2_128_concat) ServerKeyId,
@@ -437,7 +437,7 @@ decl_storage! {
 		DocumentKeyStoreRequestsKeys: Vec<ServerKeyId>;
 		/// All active document key store requests.
 		DocumentKeyStoreRequests: map hasher(blake2_128_concat) ServerKeyId
-			=> Option<DocumentKeyStoreRequest<<T as frame_system::Trait>::BlockNumber>>;
+			=> Option<DocumentKeyStoreRequest<<T as frame_system::Config>::BlockNumber>>;
 		/// Document key store confirmations.
 		DocumentKeyStoreResponses: double_map
 			hasher(blake2_128_concat) ServerKeyId,
@@ -450,7 +450,7 @@ decl_storage! {
 		DocumentKeyShadowRetrievalRequestsKeys: Vec<(ServerKeyId, EntityId)>;
 		/// All active document key shadow retrieval requests
 		DocumentKeyShadowRetrievalRequests: map hasher(blake2_128_concat) (ServerKeyId, EntityId)
-			=> Option<DocumentKeyShadowRetrievalRequest<<T as frame_system::Trait>::BlockNumber>>;
+			=> Option<DocumentKeyShadowRetrievalRequest<<T as frame_system::Config>::BlockNumber>>;
 		/// Reported common portions of document keys.
 		DocumentKeyShadowRetrievalCommonResponses: double_map
 			hasher(blake2_128_concat) (ServerKeyId, EntityId),
@@ -488,7 +488,7 @@ decl_storage! {
 	}
 }
 
-impl<T: Trait> Module<T> {
+impl<T: Config> Module<T> {
 	/// Get snapshot of key servers set state.
 	pub fn key_server_set_snapshot(key_server: KeyServerId) -> KeyServerSetSnapshot {
 		key_server_set::<T>().snapshot(key_server)
@@ -618,7 +618,7 @@ pub(crate) type KeyServerSet<T> = key_server_set::KeyServerSetWithMigration<
 >;
 
 /// Create key server set.
-pub(crate) fn key_server_set<T: Trait>() -> KeyServerSet<T> {
+pub(crate) fn key_server_set<T: Config>() -> KeyServerSet<T> {
 	key_server_set::KeyServerSetWithMigration::with_storage(
 		Default::default(),
 		Default::default(),
@@ -627,7 +627,7 @@ pub(crate) fn key_server_set<T: Trait>() -> KeyServerSet<T> {
 }
 
 /// Returns entity ID associated with given account. Fails if there's no association.
-pub fn resolve_entity_id<T: Trait>(origin: &T::AccountId) -> Result<EntityId, &'static str> {
+pub fn resolve_entity_id<T: Config>(origin: &T::AccountId) -> Result<EntityId, &'static str> {
 	let origin_id = ClaimedId::<T>::get(origin);
 	match origin_id {
 		Some(id) => Ok(id),

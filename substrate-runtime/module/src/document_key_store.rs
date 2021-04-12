@@ -23,7 +23,7 @@ use primitives::{EntityId, ServerKeyId, KeyServerId};
 use frame_system::ensure_signed;
 use crate::service::{Responses, ResponseSupport, SecretStoreService};
 use super::{
-	Trait, Module, Event,
+	Config, Module, Event,
 	DocumentKeyStoreFee,
 	DocumentKeyStoreRequests, DocumentKeyStoreRequestsKeys,
 	DocumentKeyStoreResponses,
@@ -50,7 +50,7 @@ pub struct DocumentKeyStoreRequest<Number> {
 /// Implementation of document key storing service.
 pub struct DocumentKeyStoreService<T>(sp_std::marker::PhantomData<T>);
 
-impl<T: Trait> DocumentKeyStoreService<T> {
+impl<T: Config> DocumentKeyStoreService<T> {
 	/// Request storing of new document key.
 	pub fn store(
 		origin: T::Origin,
@@ -169,7 +169,7 @@ impl<T: Trait> DocumentKeyStoreService<T> {
 }
 
 /// Deletes request and all associated data.
-fn delete_request<T: Trait>(request: &ServerKeyId) {
+fn delete_request<T: Config>(request: &ServerKeyId) {
 	DocumentKeyStoreResponses::remove_prefix(request);
 	DocumentKeyStoreRequests::<T>::remove(request);
 	DocumentKeyStoreRequestsKeys::mutate(|list| {

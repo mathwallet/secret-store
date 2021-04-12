@@ -19,7 +19,7 @@ use frame_support::StorageMap;
 use frame_system::ensure_signed;
 use sp_std::marker::PhantomData;
 use primitives::KeyServerId;
-use crate::{ClaimedId, Trait};
+use crate::{ClaimedId, Config};
 
 /// Entity id related data storage.
 pub(crate) trait Storage {
@@ -33,7 +33,7 @@ pub(crate) trait Storage {
 /// The storage of single key server set.
 pub(crate) struct RuntimeStorage<T>(PhantomData<T>);
 
-impl<T: Trait> Storage for RuntimeStorage<T> {
+impl<T: Config> Storage for RuntimeStorage<T> {
 	type EntityId = T::Origin;
 
 	fn resolve_key_server_id(&self, id: Self::EntityId) -> Result<KeyServerId, &'static str> {

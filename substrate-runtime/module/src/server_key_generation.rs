@@ -23,7 +23,7 @@ use primitives::{EntityId, ServerKeyId, KeyServerId};
 use frame_system::ensure_signed;
 use crate::service::{Responses, ResponseSupport, SecretStoreService};
 use super::{
-	Trait, Module, Event,
+	Config, Module, Event,
 	ServerKeyGenerationFee,
 	ServerKeyGenerationRequests, ServerKeyGenerationRequestsKeys,
 	ServerKeyGenerationResponses,
@@ -47,7 +47,7 @@ pub struct ServerKeyGenerationRequest<Number> {
 /// Implementation of server key generation service.
 pub struct ServerKeyGenerationService<T>(sp_std::marker::PhantomData<T>);
 
-impl<T: Trait> ServerKeyGenerationService<T> {
+impl<T: Config> ServerKeyGenerationService<T> {
 	/// Request new server key generation. Generated key will be published via
 	/// ServerKeyGenerated event when available.
 	pub fn generate(
@@ -179,7 +179,7 @@ impl<T: Trait> ServerKeyGenerationService<T> {
 }
 
 /// Deletes request and all associated data.
-fn delete_request<T: Trait>(request: &ServerKeyId) {
+fn delete_request<T: Config>(request: &ServerKeyId) {
 	ServerKeyGenerationResponses::remove_prefix(request);
 	ServerKeyGenerationRequests::<T>::remove(request);
 	ServerKeyGenerationRequestsKeys::mutate(|list| {

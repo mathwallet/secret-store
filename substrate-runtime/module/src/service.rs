@@ -25,7 +25,7 @@ use primitives::{KeyServerId, KeyServersMask};
 use sp_std::vec::Vec;
 use super::{
 	BalanceOf,
-	Trait,
+	Config,
 	ClaimedId, ClaimedBy,
 	CurrentKeyServers, CurrentSetChangeBlock,
 };
@@ -85,9 +85,9 @@ pub enum ResponseSupport {
 /// Implementation of key server set with migration support
 pub struct SecretStoreService<T>(sp_std::marker::PhantomData<T>);
 
-impl<T: Trait> SecretStoreService<T> {
+impl<T: Config> SecretStoreService<T> {
 	/// Creates new responses structure.
-	pub fn new_responses() -> Responses<<T as frame_system::Trait>::BlockNumber> {
+	pub fn new_responses() -> Responses<<T as frame_system::Config>::BlockNumber> {
 		Responses {
 			key_servers_change_block: CurrentSetChangeBlock::<T>::get(),
 			responded_key_servers_mask: Default::default(),
@@ -149,7 +149,7 @@ impl<T: Trait> SecretStoreService<T> {
 	pub fn insert_response<RequestKey, Response, Map>(
 		key_server_index: u8,
 		threshold: u8,
-		responses: &mut Responses<<T as frame_system::Trait>::BlockNumber>,
+		responses: &mut Responses<<T as frame_system::Config>::BlockNumber>,
 		request: &RequestKey,
 		response: &Response,
 	) -> Result<ResponseSupport, &'static str> where
@@ -204,7 +204,7 @@ impl<T: Trait> SecretStoreService<T> {
 	/// Returns true if resonse is required.
 	pub fn is_response_required(
 		key_server: KeyServerId,
-		responses: &Responses<<T as frame_system::Trait>::BlockNumber>
+		responses: &Responses<<T as frame_system::Config>::BlockNumber>
 	) -> bool {
 		let key_server_index = match SecretStoreService::<T>::key_server_index_from_id(key_server) {
 			Ok(key_server_index) => key_server_index,

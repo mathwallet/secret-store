@@ -24,7 +24,7 @@ use sp_std::{
 };
 use primitives::{KeyServerId, KeyServersMask, key_server_set::{MigrationId as MigrationIdT, KeyServerNetworkAddress}};
 use crate::{
-	Trait,
+	Config,
 	Owner, IsInitialized,
 	MigrationId, MigrationConfirmations, CurrentSetChangeBlock,
 	CurrentKeyServers, MigrationKeyServers, NewKeyServers,
@@ -273,9 +273,9 @@ impl<T> Default for RuntimeStorageWithMigration<T> {
 	}
 }
 
-impl<T: Trait> StorageWithMigration for RuntimeStorageWithMigration<T> {
+impl<T: Config> StorageWithMigration for RuntimeStorageWithMigration<T> {
 	type EntityId = T::Origin;
-	type BlockNumber = <T as frame_system::Trait>::BlockNumber;
+	type BlockNumber = <T as frame_system::Config>::BlockNumber;
 
 	fn ensure_can_modify(&self, caller: Self::EntityId) -> Result<(), &'static str> {
 		ensure!(
