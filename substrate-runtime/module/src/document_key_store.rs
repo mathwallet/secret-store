@@ -60,7 +60,7 @@ impl<T: Config> DocumentKeyStoreService<T> {
 	) -> Result<(), &'static str> {
 		// limit number of requests in the queue
 		ensure!(
-			(DocumentKeyStoreRequestsKeys::decode_len()? as u64) < MAX_REQUESTS,
+			(DocumentKeyStoreRequestsKeys::decode_len().unwrap_or(0) as u64) < MAX_REQUESTS,
 			"Too many active requests. Try later",
 		);
 
@@ -84,7 +84,7 @@ impl<T: Config> DocumentKeyStoreService<T> {
 			responses: SecretStoreService::<T>::new_responses(),
 		};
 		DocumentKeyStoreRequests::<T>::insert(id, request);
-		DocumentKeyStoreRequestsKeys::append(sp_std::iter::once(&id))?;
+		DocumentKeyStoreRequestsKeys::append(&id);
 
 		// emit event
 		Module::<T>::deposit_event(Event::DocumentKeyStoreRequested(id, author, common_point, encrypted_point));

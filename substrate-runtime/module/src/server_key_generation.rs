@@ -64,7 +64,7 @@ impl<T: Config> ServerKeyGenerationService<T> {
 
 		// limit number of requests in the queue
 		ensure!(
-			(ServerKeyGenerationRequestsKeys::decode_len()? as u64) < MAX_REQUESTS,
+			(ServerKeyGenerationRequestsKeys::decode_len().unwrap_or(0) as u64) < MAX_REQUESTS,
 			"Too many active requests. Try later",
 		);
 
@@ -87,7 +87,7 @@ impl<T: Config> ServerKeyGenerationService<T> {
 			responses: SecretStoreService::<T>::new_responses(),
 		};
 		ServerKeyGenerationRequests::<T>::insert(id, request);
-		ServerKeyGenerationRequestsKeys::append(sp_std::iter::once(&id))?;
+		ServerKeyGenerationRequestsKeys::append(&id);
 
 		// emit event
 		Module::<T>::deposit_event(Event::ServerKeyGenerationRequested(id, author, threshold));

@@ -154,7 +154,7 @@ decl_module! {
 
 			let origin = ensure_signed(origin)?;
 			let origin = resolve_entity_id::<T>(&origin)?;
-			KeyOwners::append(id, sp_std::iter::once(origin))?;
+			KeyOwners::append(id, origin);
 		}
 
 		/// Transfer key ownership.

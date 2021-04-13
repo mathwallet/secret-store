@@ -79,7 +79,7 @@ impl<T: Config> DocumentKeyShadowRetrievalService<T> {
 	) -> Result<(), &'static str> {
 		// limit number of requests in the queue
 		ensure!(
-			(DocumentKeyShadowRetrievalRequestsKeys::decode_len()? as u64) < MAX_REQUESTS,
+			(DocumentKeyShadowRetrievalRequestsKeys::decode_len().unwrap_or(0) as u64) < MAX_REQUESTS,
 			"Too many active requests. Try later",
 		);
 
@@ -131,7 +131,7 @@ impl<T: Config> DocumentKeyShadowRetrievalService<T> {
 			personal_retrieval_errors_count: 0,
 		};
 		DocumentKeyShadowRetrievalRequests::<T>::insert(retrieval_id, request);
-		DocumentKeyShadowRetrievalRequestsKeys::append(sp_std::iter::once(&retrieval_id))?;
+		DocumentKeyShadowRetrievalRequestsKeys::append(&retrieval_id);
 
 		// emit event
 		Module::<T>::deposit_event(Event::DocumentKeyShadowRetrievalRequested(id, requester));

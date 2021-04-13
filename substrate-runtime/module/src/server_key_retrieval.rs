@@ -57,7 +57,7 @@ impl<T: Config> ServerKeyRetrievalService<T> {
 	) -> Result<(), &'static str> {
 		// limit number of requests in the queue
 		ensure!(
-			(ServerKeyRetrievalRequestsKeys::decode_len()? as u64) < MAX_REQUESTS,
+			(ServerKeyRetrievalRequestsKeys::decode_len().unwrap_or(0) as u64) < MAX_REQUESTS,
 			"Too many active requests. Try later",
 		);
 
@@ -84,7 +84,7 @@ impl<T: Config> ServerKeyRetrievalService<T> {
 			server_key_with_max_threshold: Default::default(),
 		};
 		ServerKeyRetrievalRequests::<T>::insert(id, request);
-		ServerKeyRetrievalRequestsKeys::append(sp_std::iter::once(&id))?;
+		ServerKeyRetrievalRequestsKeys::append(&id);
 
 		// emit event
 		Module::<T>::deposit_event(Event::ServerKeyRetrievalRequested(id));
