@@ -17,3 +17,5 @@
 *.iml
 *.swp
 *.swo
+ssdb*
+ss*.log

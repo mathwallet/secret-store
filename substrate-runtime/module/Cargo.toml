@@ -17,7 +17,7 @@ sp-runtime = { git = "https://github.com/paritytech/substrate.git", branch = "ma
 sp-std = { git = "https://github.com/paritytech/substrate.git", branch = "master", default-features = false }
 
 [dev-dependencies]
-parity-crypto = { version = "0.6", features = ["publickey"] }
+parity-crypto = { version = "0.8", features = ["publickey"] }
 
 [features]
 default = ["std"]
