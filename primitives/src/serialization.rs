@@ -62,11 +62,14 @@ macro_rules! impl_bytes_deserialize {
 	};
 	($name: ident, $value: expr, false) => {
 		$value[2..].parse().map($name).map_err(SerdeError::custom)
+	};
+	($name: ident, $value: expr, false, Secret) => {
+		parity_crypto::publickey::Secret::copy_from_str(&$value[2..]).map($name).map_err(SerdeError::custom)
 	}
 }
 
 macro_rules! impl_bytes {
-	($name: ident, $other: ident, $from_hex: ident, ($($trait: ident),*)) => {
+	($name: ident, $other: ident, $from_hex: ident, ($($trait: ident),*)$(, $secret: ident)?) => {
 		#[derive(Clone, Debug, PartialEq, Eq, $($trait,)*)]
 		pub struct $name(pub $other);
 
@@ -109,7 +112,7 @@ macro_rules! impl_bytes {
 
 					fn visit_str<E>(self, value: &str) -> Result<Self::Value, E> where E: SerdeError {
 						if value.len() >= 2 && &value[0..2] == "0x" && value.len() & 1 == 0 {
-							impl_bytes_deserialize!($name, value, $from_hex)
+							impl_bytes_deserialize!($name, value, $from_hex$(, $secret)?)
 						} else {
 							Err(SerdeError::custom("invalid format"))
 						}
@@ -139,7 +142,7 @@ impl_bytes!(SerializableBytes, Bytes, true, (Default));
 impl_bytes!(SerializableH256, H256, false, (Default, PartialOrd, Ord));
 impl_bytes!(SerializableH160, H160, false, (Default, PartialOrd, Ord));
 impl_bytes!(SerializablePublic, Public, false, (Default, PartialOrd, Ord));
-impl_bytes!(SerializableSecret, Secret, false, ());
+impl_bytes!(SerializableSecret, Secret, false, (), Secret);
 impl_bytes!(SerializableSignature, Signature, false, ());
 
 /// Serializable shadow decryption result.
