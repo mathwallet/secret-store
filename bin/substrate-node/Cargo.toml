@@ -24,7 +24,7 @@ sp-finality-grandpa = { git = "https://github.com/paritytech/substrate.git", bra
 sp-inherents = { git = "https://github.com/paritytech/substrate.git", branch = "master" }
 sp-runtime = { git = "https://github.com/paritytech/substrate.git", branch = "master" }
 substrate-frame-rpc-system = { git = "https://github.com/paritytech/substrate.git", branch = "master" }
-secretstore-runtime = { package = "parity-secretstore-substrate-runtime", path = "../../substrate-runtime/runtime" }
+secretstore-runtime = { package = "mathchain-runtime", path = "../../substrate-runtime/runtime" }
 
 [build-dependencies]
 vergen = "3.0.4"

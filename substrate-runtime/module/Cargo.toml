@@ -8,7 +8,6 @@ edition = "2018"
 codec = { package = "parity-scale-codec", version = "2.0.1", default-features = false }
 frame-support = { git = "https://github.com/paritytech/substrate.git", branch = "master", default-features = false }
 frame-system = { git = "https://github.com/paritytech/substrate.git", branch = "master", default-features = false }
-pallet-balances = { git = "https://github.com/paritytech/substrate.git", branch = "master", default-features = false }
 primitives = { package = "parity-secretstore-substrate-runtime-primitives", path = "../primitives", default-features = false }
 serde = { version = "1.0.101", optional = true }
 sp-core = { git = "https://github.com/paritytech/substrate.git", branch = "master", default-features = false }
@@ -25,7 +24,6 @@ std = [
 	"codec/std",
 	"frame-support/std",
 	"frame-system/std",
-	"pallet-balances/std",
 	"primitives/std",
 	"serde",
 	"sp-core/std",

@@ -39,7 +39,7 @@ sp-version = { git = "https://github.com/paritytech/substrate.git", branch = "ma
 
 key-server = { package = "parity-secretstore-key-server", path = "../../key-server" }
 primitives = { package = "parity-secretstore-primitives", path = "../../primitives" }
-substrate-runtime = { package = "parity-secretstore-substrate-runtime", path = "../../substrate-runtime/runtime" }
+substrate-runtime = { package = "mathchain-runtime", path = "../../substrate-runtime/runtime" }
 substrate-service = { package = "parity-secretstore-substrate-service", path = "../../substrate-service" }
 runtime-module = { package = "parity-secretstore-substrate-runtime-module", path = "../../substrate-runtime/module" }
 runtime-primitives = { package = "parity-secretstore-substrate-runtime-primitives", path = "../../substrate-runtime/primitives" }
