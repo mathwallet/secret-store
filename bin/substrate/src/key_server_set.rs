@@ -23,7 +23,7 @@ use std::{
 use futures::FutureExt;
 use log::{error, trace};
 use parking_lot::RwLock;
-use sp_core::Encode;
+use codec::Encode;
 use sp_core::H256;
 use primitives::{
 	KeyServerId,
