@@ -26,7 +26,7 @@ use futures::{
 	future::{Ready, TryFutureExt, ready},
 };
 use log::error;
-use codec::Encode;
+use sp_core::Encode;
 use primitives::{
 	Address, KeyServerId, ServerKeyId,
 	key_server_set::KeyServerSet,

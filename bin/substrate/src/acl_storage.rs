@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity Secret Store.  If not, see <http://www.gnu.org/licenses/>.
 
-use codec::Encode;
+use sp_core::Encode;
 use primitives::{
 	Address, ServerKeyId,
 	acl_storage::AclStorage,

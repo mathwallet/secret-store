@@ -15,7 +15,7 @@
 // along with Parity Secret Store.  If not, see <http://www.gnu.org/licenses/>.
 
 use std::{future::Future, sync::Arc};
-use codec::{Decode, Encode};
+use sp_core::{Decode, Encode};
 use parking_lot::RwLock;
 use sp_core::crypto::Pair as _;
 use crate::runtime::{
