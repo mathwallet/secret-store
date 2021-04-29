@@ -62,6 +62,8 @@ pub struct Client {
 	genesis_hash: BlockHash,
 	/// Runtime version.
 	runtime_version: u32,
+	/// Transaction version.
+	transaction_version: u32,
 	/// Best local (finalized) block.
 	best_block: Arc<RwLock<(crate::runtime::BlockNumber, crate::runtime::BlockHash)>>,
 }
@@ -100,6 +102,7 @@ impl Client {
 			signer,
 			genesis_hash,
 			runtime_version: runtime_version.spec_version,
+			transaction_version: runtime_version.transaction_version,
 			best_block: Arc::new(RwLock::new((finalized_header.number, finalized_hash))),
 		})
 	}
@@ -201,6 +204,7 @@ impl Client {
 			index,
 			self.genesis_hash,
 			self.runtime_version,
+			self.transaction_version,
 		);
 		let hex_transaction = format!("0x{}", hex::encode(transaction.encode()));
 		self.rpc_client.request(
@@ -223,6 +227,7 @@ impl Client {
 			index,
 			self.genesis_hash,
 			self.runtime_version,
+			self.transaction_version,
 		);
 		let hex_transaction = format!("0x{}", hex::encode(transaction.encode()));
 		self.rpc_client.subscribe(

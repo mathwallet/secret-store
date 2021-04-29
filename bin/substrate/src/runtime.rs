@@ -87,6 +87,7 @@ pub fn create_transaction(
 	index: Index,
 	genesis_hash: BlockHash,
 	runtime_version: u32,
+	transaction_version: u32,
 ) -> UncheckedExtrinsic {
 	let extra = |i: Index, f: Balance| {
 		(
@@ -104,6 +105,7 @@ pub fn create_transaction(
 		extra(index, 0),
 		(
 			runtime_version,
+			transaction_version,
 			genesis_hash,
 			genesis_hash,
 			(),
