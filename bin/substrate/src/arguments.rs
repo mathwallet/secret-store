@@ -75,7 +75,30 @@ mod opt_secret {
 		D: Deserializer<'de>,
 	{
 		#[derive(Deserialize)]
-		struct Helper(#[serde(with = "serde_with::rust::display_fromstr")] Secret);
+		struct Helper(#[serde(with = "serde_helper")] Secret);
+		mod serde_helper {
+			use super::*;
+
+			pub fn deserialize<'de, D>(deserializer: D) -> Result<Secret, D::Error>
+			where
+				D: serde::Deserializer<'de>,
+			{
+				Secret::copy_from_str(&String::deserialize(
+					deserializer,
+				)?).map_err(serde::de::Error::custom)
+			}
+
+			pub fn serialize<S, T>(
+				t: &T,
+				serializer: S,
+			) -> Result<S::Ok, S::Error>
+			where
+				S: serde::Serializer,
+				T: core::fmt::Display
+			{
+				serializer.serialize_str(&t.to_string())
+			}
+		}
 
 		let helper = Option::deserialize(deserializer)?;
 		Ok(helper.map(|Helper(secret)| secret))
