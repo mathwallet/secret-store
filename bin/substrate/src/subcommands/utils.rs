@@ -82,8 +82,8 @@ pub fn require_public_arg(matches: &ArgMatches, arg: &str) -> Result<Public, Str
 
 /// Parse required hex-encoded Secret arg.
 pub fn require_secret_arg(matches: &ArgMatches, arg: &str) -> Result<Secret, String> {
-	Secret::from_str(
-		matches
+	Secret::copy_from_str(
+		&matches
 			.value_of(arg)
 			.expect(REQUIRED_ARG_PROOF)
 			.trim_start_matches("0x")

@@ -98,7 +98,7 @@ pub fn parse_arguments<'a>(
 
 	Ok(Arguments {
 		self_secret: matches.value_of("self-secret")
-			.map(|self_secret| Secret::from_str(self_secret).map_err(|err| format!("{}", err)))
+			.map(|self_secret| Secret::copy_from_str(&self_secret).map_err(|err| format!("{}", err)))
 			.or_else(|| toml_arguments.self_secret.clone().map(Ok))
 			.ok_or_else(|| String::from("Key server secret key must be specified"))??,
 		db_path: matches.value_of("db-path")
