@@ -7,24 +7,24 @@ edition = "2018"
 [dependencies]
 jsonrpc-core = "14.0.3"
 structopt = "0.3.8"
-sc-basic-authorship = "0.8.0-alpha.5"
-sc-cli = "0.8.0-alpha.5"
-sc-client = "0.8.0-alpha.5"
-sc-client-api = "2.0.0-alpha.5"
-sc-consensus-aura = "0.8.0-alpha.5"
-sc-executor = "0.8.0-alpha.5"
-sc-finality-grandpa = "0.8.0-alpha.5"
-sc-rpc = "2.0.0-alpha.5"
-sc-transaction-pool = "2.0.0-alpha.5"
-sc-service = "0.8.0-alpha.5"
-sp-consensus = "0.8.0-alpha.5"
-sp-consensus-aura = "0.8.0-alpha.5"
-sp-core = "2.0.0-alpha.5"
-sp-finality-grandpa = "2.0.0-alpha.5"
-sp-inherents = "2.0.0-alpha.5"
-sp-runtime = "2.0.0-alpha.5"
-substrate-frame-rpc-system = "2.0.0-alpha.5"
-secretstore-runtime = { package = "parity-secretstore-substrate-runtime", path = "../../substrate-runtime/runtime" }
+sc-basic-authorship = { git = "https://github.com/paritytech/substrate.git", branch = "master" }
+sc-cli = { git = "https://github.com/paritytech/substrate.git", branch = "master" }
+# sc-client = { git = "https://github.com/paritytech/substrate.git", branch = "master" }
+sc-client-api = { git = "https://github.com/paritytech/substrate.git", branch = "master" }
+sc-consensus-aura = { git = "https://github.com/paritytech/substrate.git", branch = "master" }
+sc-executor = { git = "https://github.com/paritytech/substrate.git", branch = "master" }
+sc-finality-grandpa = { git = "https://github.com/paritytech/substrate.git", branch = "master" }
+sc-rpc = { git = "https://github.com/paritytech/substrate.git", branch = "master" }
+sc-transaction-pool = { git = "https://github.com/paritytech/substrate.git", branch = "master" }
+sc-service = { git = "https://github.com/paritytech/substrate.git", branch = "master" }
+sp-consensus = { git = "https://github.com/paritytech/substrate.git", branch = "master" }
+sp-consensus-aura = { git = "https://github.com/paritytech/substrate.git", branch = "master" }
+sp-core = { git = "https://github.com/paritytech/substrate.git", branch = "master" }
+sp-finality-grandpa = { git = "https://github.com/paritytech/substrate.git", branch = "master" }
+sp-inherents = { git = "https://github.com/paritytech/substrate.git", branch = "master" }
+sp-runtime = { git = "https://github.com/paritytech/substrate.git", branch = "master" }
+substrate-frame-rpc-system = { git = "https://github.com/paritytech/substrate.git", branch = "master" }
+secretstore-runtime = { package = "mathchain-runtime", path = "../../substrate-runtime/runtime" }
 
 [build-dependencies]
 vergen = "3.0.4"

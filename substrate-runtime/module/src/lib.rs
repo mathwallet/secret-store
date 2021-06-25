@@ -48,24 +48,22 @@ use server_key_generation::{ServerKeyGenerationRequest, ServerKeyGenerationServi
 use server_key_retrieval::{ServerKeyRetrievalRequest, ServerKeyRetrievalService};
 use key_server_set_storage::KeyServer;
 
-pub type BalanceOf<T> = <<T as Trait>::Currency as Currency<<T as frame_system::Trait>::AccountId>>::Balance;
+pub type BalanceOf<T> = <<T as Config>::Currency as Currency<<T as frame_system::Config>::AccountId>>::Balance;
 
 /// The module configuration trait
-pub trait Trait: frame_system::Trait {
+pub trait Config: frame_system::Config {
 	/// They overarching event type.
-	type Event: From<Event> + Into<<Self as frame_system::Trait>::Event>;
+	type Event: From<Event> + Into<<Self as frame_system::Config>::Event>;
 
 	/// The currency type used for paying services.
 	type Currency: Currency<Self::AccountId>;
 }
 
 decl_module! {
-	pub struct Module<T: Trait> for enum Call where origin: T::Origin {
+	pub struct Module<T: Config> for enum Call where origin: T::Origin {
 		fn deposit_event() = default;
 
-		/// Change key server set owner.
-		///
-		/// Can only be called by current owner.
+		#[weight = 50_000_000]
 		pub fn change_owner(origin, new_owner: T::AccountId) {
 			let origin = ensure_signed(origin)?;
 			ensure!(
@@ -80,6 +78,7 @@ decl_module! {
 		///
 		/// Any account may claim single entity id.
 		/// Entity id may only be claimed by at most one account.
+		#[weight = 50_000_000]
 		pub fn claim_id(origin, id: EntityId) {
 			ensure!(
 				!<ClaimedBy<T>>::contains_key(&id),
@@ -99,6 +98,7 @@ decl_module! {
 		/// Complete key servers set initialization.
 		///
 		/// Can only be called by owner.
+		#[weight = 50_000_000]
 		pub fn complete_initialization(origin) {
 			key_server_set::<T>().complete_initialization(origin)?;
 		}
@@ -106,6 +106,7 @@ decl_module! {
 		/// Add key server to the set.
 		///
 		/// Can only be called by owner.
+		#[weight = 50_000_000]
 		pub fn add_key_server(origin, id: KeyServerId, network_address: KeyServerNetworkAddress) {
 			key_server_set::<T>().add_key_server(origin, id, network_address)?;
 		}
@@ -113,6 +114,7 @@ decl_module! {
 		/// Remove key server from the set.
 		///
 		/// Can only be called by owner.
+		#[weight = 50_000_000]
 		pub fn remove_key_server(origin, id: KeyServerId) {
 			key_server_set::<T>().remove_key_server(origin, id)?;
 		}
@@ -121,6 +123,7 @@ decl_module! {
 		///
 		/// Can only be called by one of key servers from UNION(current, new) set.
 		/// Can only be called when migration is required.
+		#[weight = 50_000_000]
 		pub fn start_migration(origin, migration_id: MigrationIdT) {
 			key_server_set::<T>().start_migration(origin, migration_id)?;
 		}
@@ -129,6 +132,7 @@ decl_module! {
 		///
 		/// Can only be called by one of key servers from migration set.
 		/// Can only be called when migration is active.
+		#[weight = 50_000_000]
 		pub fn confirm_migration(origin, migration_id: MigrationIdT) {
 			key_server_set::<T>().confirm_migration(origin, migration_id)?;
 		}
@@ -141,6 +145,7 @@ decl_module! {
 		///
 		/// **IMPORTANT**: it is a good idea to claim ownership **before** key generation.
 		/// Otherwise anyone could claim (i.e. steal) your key.
+		#[weight = 50_000_000]
 		pub fn claim_key(origin, id: ServerKeyId) {
 			ensure!(
 				!KeyOwners::contains_key(&id),
@@ -149,7 +154,7 @@ decl_module! {
 
 			let origin = ensure_signed(origin)?;
 			let origin = resolve_entity_id::<T>(&origin)?;
-			KeyOwners::append(id, sp_std::iter::once(origin))?;
+			KeyOwners::append(id, origin);
 		}
 
 		/// Transfer key ownership.
@@ -157,6 +162,7 @@ decl_module! {
 		/// This is an example of how key access could be managed - we allow at most
 		/// 1 key 'owner' at a time. By calling this method you're transferring access
 		/// to private portion of key with given id from yourself to given account.
+		#[weight = 50_000_000]
 		pub fn transfer_key(origin, id: ServerKeyId, new_claimant: EntityId) {
 			let origin = ensure_signed(origin)?;
 			let origin = resolve_entity_id::<T>(&origin)?;
@@ -174,6 +180,7 @@ decl_module! {
 		/// Generated server key will be published using ServerKeyGenerated event.
 		/// If SecretStore will be unable to generate server key, then it will emit
 		/// ServerKeyGenerationError event.
+		#[weight = 50_000_000]
 		pub fn generate_server_key(origin, id: ServerKeyId, threshold: u8) {
 			ServerKeyGenerationService::<T>::generate(origin, id, threshold)?;
 		}
@@ -181,6 +188,7 @@ decl_module! {
 		/// Called when generation is reported by key server.
 		///
 		/// Can only be called by key servers from the current set.
+		#[weight = 50_000_000]
 		pub fn server_key_generated(origin, id: ServerKeyId, server_key_public: sp_core::H512) {
 			ServerKeyGenerationService::<T>::on_generated(origin, id, server_key_public)?;
 		}
@@ -188,6 +196,7 @@ decl_module! {
 		/// Called when generation error is reported by key server.
 		///
 		/// Can only be called by key servers from the current set.
+		#[weight = 50_000_000]
 		pub fn server_key_generation_error(origin, id: ServerKeyId) {
 			ServerKeyGenerationService::<T>::on_generation_error(origin, id)?;
 		}
@@ -198,6 +207,7 @@ decl_module! {
 		/// Retrieved server key will be published using ServerKeyRetrieved event.
 		/// If SecretStore will be unable to retrieve server key, then it will emit
 		/// ServerKeyRetrievalError event.
+		#[weight = 50_000_000]
 		pub fn retrieve_server_key(origin, id: ServerKeyId) {
 			ServerKeyRetrievalService::<T>::retrieve(origin, id)?;
 		}
@@ -205,6 +215,7 @@ decl_module! {
 		/// Called when generation is reported by key server.
 		///
 		/// Can only be called by key servers from the current set.
+		#[weight = 50_000_000]
 		pub fn server_key_retrieved(origin, id: ServerKeyId, server_key_public: sp_core::H512, threshold: u8) {
 			ServerKeyRetrievalService::<T>::on_retrieved(origin, id, server_key_public, threshold)?;
 		}
@@ -212,6 +223,7 @@ decl_module! {
 		/// Called when generation error is reported by key server.
 		///
 		/// Can only be called by key servers from the current set.
+		#[weight = 50_000_000]
 		pub fn server_key_retrieval_error(origin, id: ServerKeyId) {
 			ServerKeyRetrievalService::<T>::on_retrieval_error(origin, id)?;
 		}
@@ -222,6 +234,7 @@ decl_module! {
 		/// Store confirmation will be published using DocumentKeyStored event.
 		/// If SecretStore will be unable to store document key, then it will emit
 		/// DocumentKeyStoreError event.
+		#[weight = 50_000_000]
 		pub fn store_document_key(origin, id: ServerKeyId, common_point: sp_core::H512, encrypted_point: sp_core::H512) {
 			DocumentKeyStoreService::<T>::store(origin, id, common_point, encrypted_point)?;
 		}
@@ -229,6 +242,7 @@ decl_module! {
 		/// Called when store is reported by key server.
 		///
 		/// Can only be called by key servers from the current set.
+		#[weight = 50_000_000]
 		pub fn document_key_stored(origin, id: ServerKeyId) {
 			DocumentKeyStoreService::<T>::on_stored(origin, id)?;
 		}
@@ -236,6 +250,7 @@ decl_module! {
 		/// Called when store error is reported by key server.
 		///
 		/// Can only be called by key servers from the current set.
+		#[weight = 50_000_000]
 		pub fn document_key_store_error(origin, id: ServerKeyId) {
 			DocumentKeyStoreService::<T>::on_store_error(origin, id)?;
 		}
@@ -247,6 +262,7 @@ decl_module! {
 		/// series of DocumentKeyPersonalRetrieved event (see DocumentKeyCommonRetrieved
 		/// description for details). If SecretStore will be unable to retrieve document
 		/// key shadow, then it will emit DocumentKeyShadowRetrievalError event.
+		#[weight = 50_000_000]
 		pub fn retrieve_document_key_shadow(origin, id: ServerKeyId, requester_public: sp_core::H512) {
 			DocumentKeyShadowRetrievalService::<T>::retrieve(origin, id, requester_public)?;
 		}
@@ -254,6 +270,7 @@ decl_module! {
 		/// Called when document key common part is reported by key server.
 		///
 		/// Can only be called by key servers from the current set.
+		#[weight = 50_000_000]
 		pub fn document_key_common_retrieved(
 			origin,
 			id: ServerKeyId,
@@ -273,6 +290,7 @@ decl_module! {
 		/// Called when document key personal part is reported by key server.
 		///
 		/// Can only be called by key servers from the current set.
+		#[weight = 50_000_000]
 		pub fn document_key_personal_retrieved(
 			origin,
 			id: ServerKeyId,
@@ -294,6 +312,7 @@ decl_module! {
 		/// Called when document key shadow retrieval error is reported by key server.
 		///
 		/// Can only be called by key servers from the current set.
+		#[weight = 50_000_000]
 		pub fn document_key_shadow_retrieval_error(origin, id: ServerKeyId, requester: EntityId) {
 			DocumentKeyShadowRetrievalService::<T>::on_retrieval_error(origin, id, requester)?;
 		}
@@ -358,15 +377,15 @@ decl_event!(
 );
 
 decl_storage! {
-	trait Store for Module<T: Trait> as SecretStore {
+	trait Store for Module<T: Config> as SecretStore {
 		/// Owner can perform some actions that are unavailable to regular users.
 		/// https://github.com/paritytech/secret-store/issues/30
-		pub Owner get(owner) config(): T::AccountId;
+		pub Owner get(fn owner) config(): T::AccountId;
 
 		/// Claimed entity ID by account ID.
-		ClaimedId get(claimed_address): map hasher(blake2_128_concat) T::AccountId => Option<EntityId>;
+		ClaimedId get(fn claimed_address): map hasher(blake2_128_concat) T::AccountId => Option<EntityId>;
 		/// Claimed account ID by entity ID.
-		ClaimedBy get(claimed_by): map hasher(blake2_128_concat) EntityId => Option<T::AccountId>;
+		ClaimedBy get(fn claimed_by): map hasher(blake2_128_concat) EntityId => Option<T::AccountId>;
 
 		/// When it is false, all changes to key server set are applied to both current and new sets,
 		/// so no migration is required.
@@ -374,7 +393,7 @@ decl_storage! {
 		/// is required.
 		IsInitialized: bool;
 		/// Number of block where last changes have been applied to **current** key server set.
-		CurrentSetChangeBlock: <T as frame_system::Trait>::BlockNumber;
+		CurrentSetChangeBlock: <T as frame_system::Config>::BlockNumber;
 
 		/// Current key servers set. This is the set of key servers that are running key server
 		/// operations at this moment.
@@ -400,27 +419,27 @@ decl_storage! {
 		KeyOwners: map hasher(blake2_128_concat) ServerKeyId => Vec<EntityId>;
 
 		/// Current server key generation fee. Splitted among all key servers from current set.
-		pub ServerKeyGenerationFee get(server_key_generation_fee) config(): BalanceOf<T>;
+		ServerKeyGenerationFee get(fn server_key_generation_fee) config(): BalanceOf<T>;
 		/// IDs of server keys that we're generating/going to generate. Every key has its
 		/// entry in ServerKeyGenerationRequests.
 		ServerKeyGenerationRequestsKeys: Vec<ServerKeyId>;
 		/// All active server key generation requests.
 		ServerKeyGenerationRequests: map hasher(blake2_128_concat) ServerKeyId
-			=> Option<ServerKeyGenerationRequest<<T as frame_system::Trait>::BlockNumber>>;
+			=> Option<ServerKeyGenerationRequest<<T as frame_system::Config>::BlockNumber>>;
 		/// Reported server keys.
 		ServerKeyGenerationResponses: double_map
 			hasher(blake2_128_concat) ServerKeyId,
 			hasher(blake2_128_concat) sp_core::H512 => u8;
 
 		/// Current server key retrieval fee. Splitted among all key servers from current set.
-		pub ServerKeyRetrievalFee get(server_key_retrieval_fee) config(): BalanceOf<T>;
+		pub ServerKeyRetrievalFee get(fn server_key_retrieval_fee) config(): BalanceOf<T>;
 		/// IDs of server keys that we're retrieving/going to retrieve. Every key has its
 		/// entry in ServerKeyRetrievalRequests.
 		ServerKeyRetrievalRequestsKeys: Vec<ServerKeyId>;
 		/// All active server key retrieval requests.
 		ServerKeyRetrievalRequests: map
 			hasher(blake2_128_concat) ServerKeyId
-			=> Option<ServerKeyRetrievalRequest<<T as frame_system::Trait>::BlockNumber>>;
+			=> Option<ServerKeyRetrievalRequest<<T as frame_system::Config>::BlockNumber>>;
 		/// Reported server keys.
 		ServerKeyRetrievalResponses: double_map
 			hasher(blake2_128_concat) ServerKeyId,
@@ -431,26 +450,26 @@ decl_storage! {
 			hasher(twox_64_concat) u8 => u8;
 
 		/// Current document key store fee. Splitted among all key servers from current set.
-		pub DocumentKeyStoreFee get(document_key_store_fee) config(): BalanceOf<T>;
+		pub DocumentKeyStoreFee get(fn document_key_store_fee) config(): BalanceOf<T>;
 		/// IDs of server keys that we're binding with document keys. Every key has its
 		/// entry in DocumentKeyStoreRequests.
 		DocumentKeyStoreRequestsKeys: Vec<ServerKeyId>;
 		/// All active document key store requests.
 		DocumentKeyStoreRequests: map hasher(blake2_128_concat) ServerKeyId
-			=> Option<DocumentKeyStoreRequest<<T as frame_system::Trait>::BlockNumber>>;
+			=> Option<DocumentKeyStoreRequest<<T as frame_system::Config>::BlockNumber>>;
 		/// Document key store confirmations.
 		DocumentKeyStoreResponses: double_map
 			hasher(blake2_128_concat) ServerKeyId,
 			hasher(twox_64_concat) () => u8;
 
 		/// Current document key shadow retrieval fee. Splitted among all key servers from current set.
-		pub DocumentKeyShadowRetrievalFee get(document_key_shadow_retrieval_fee) config(): BalanceOf<T>;
+		pub DocumentKeyShadowRetrievalFee get(fn document_key_shadow_retrieval_fee) config(): BalanceOf<T>;
 		/// IDs of (server key, requester) that we're retrieving/goint to retrieve associated document
 		/// key shadows from/for. Every key has its entry in DocumentKeyShadowRetrievalRequests.
-		DocumentKeyShadowRetrievalRequestsKeys: Vec<(ServerKeyId, EntityId)>;
+		pub DocumentKeyShadowRetrievalRequestsKeys: Vec<(ServerKeyId, EntityId)>;
 		/// All active document key shadow retrieval requests
-		DocumentKeyShadowRetrievalRequests: map hasher(blake2_128_concat) (ServerKeyId, EntityId)
-			=> Option<DocumentKeyShadowRetrievalRequest<<T as frame_system::Trait>::BlockNumber>>;
+		pub DocumentKeyShadowRetrievalRequests: map hasher(blake2_128_concat) (ServerKeyId, EntityId)
+			=> Option<DocumentKeyShadowRetrievalRequest<<T as frame_system::Config>::BlockNumber>>;
 		/// Reported common portions of document keys.
 		DocumentKeyShadowRetrievalCommonResponses: double_map
 			hasher(blake2_128_concat) (ServerKeyId, EntityId),
@@ -488,7 +507,7 @@ decl_storage! {
 	}
 }
 
-impl<T: Trait> Module<T> {
+impl<T: Config> Module<T> {
 	/// Get snapshot of key servers set state.
 	pub fn key_server_set_snapshot(key_server: KeyServerId) -> KeyServerSetSnapshot {
 		key_server_set::<T>().snapshot(key_server)
@@ -618,7 +637,7 @@ pub(crate) type KeyServerSet<T> = key_server_set::KeyServerSetWithMigration<
 >;
 
 /// Create key server set.
-pub(crate) fn key_server_set<T: Trait>() -> KeyServerSet<T> {
+pub(crate) fn key_server_set<T: Config>() -> KeyServerSet<T> {
 	key_server_set::KeyServerSetWithMigration::with_storage(
 		Default::default(),
 		Default::default(),
@@ -627,7 +646,7 @@ pub(crate) fn key_server_set<T: Trait>() -> KeyServerSet<T> {
 }
 
 /// Returns entity ID associated with given account. Fails if there's no association.
-pub fn resolve_entity_id<T: Trait>(origin: &T::AccountId) -> Result<EntityId, &'static str> {
+pub fn resolve_entity_id<T: Config>(origin: &T::AccountId) -> Result<EntityId, &'static str> {
 	let origin_id = ClaimedId::<T>::get(origin);
 	match origin_id {
 		Some(id) => Ok(id),

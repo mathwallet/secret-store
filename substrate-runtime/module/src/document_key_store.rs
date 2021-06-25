@@ -23,7 +23,7 @@ use primitives::{EntityId, ServerKeyId, KeyServerId};
 use frame_system::ensure_signed;
 use crate::service::{Responses, ResponseSupport, SecretStoreService};
 use super::{
-	Trait, Module, Event,
+	Config, Module, Event,
 	DocumentKeyStoreFee,
 	DocumentKeyStoreRequests, DocumentKeyStoreRequestsKeys,
 	DocumentKeyStoreResponses,
@@ -50,7 +50,7 @@ pub struct DocumentKeyStoreRequest<Number> {
 /// Implementation of document key storing service.
 pub struct DocumentKeyStoreService<T>(sp_std::marker::PhantomData<T>);
 
-impl<T: Trait> DocumentKeyStoreService<T> {
+impl<T: Config> DocumentKeyStoreService<T> {
 	/// Request storing of new document key.
 	pub fn store(
 		origin: T::Origin,
@@ -60,7 +60,7 @@ impl<T: Trait> DocumentKeyStoreService<T> {
 	) -> Result<(), &'static str> {
 		// limit number of requests in the queue
 		ensure!(
-			(DocumentKeyStoreRequestsKeys::decode_len()? as u64) < MAX_REQUESTS,
+			(DocumentKeyStoreRequestsKeys::decode_len().unwrap_or(0) as u64) < MAX_REQUESTS,
 			"Too many active requests. Try later",
 		);
 
@@ -84,7 +84,7 @@ impl<T: Trait> DocumentKeyStoreService<T> {
 			responses: SecretStoreService::<T>::new_responses(),
 		};
 		DocumentKeyStoreRequests::<T>::insert(id, request);
-		DocumentKeyStoreRequestsKeys::append(sp_std::iter::once(&id))?;
+		DocumentKeyStoreRequestsKeys::append(&id);
 
 		// emit event
 		Module::<T>::deposit_event(Event::DocumentKeyStoreRequested(id, author, common_point, encrypted_point));
@@ -169,7 +169,7 @@ impl<T: Trait> DocumentKeyStoreService<T> {
 }
 
 /// Deletes request and all associated data.
-fn delete_request<T: Trait>(request: &ServerKeyId) {
+fn delete_request<T: Config>(request: &ServerKeyId) {
 	DocumentKeyStoreResponses::remove_prefix(request);
 	DocumentKeyStoreRequests::<T>::remove(request);
 	DocumentKeyStoreRequestsKeys::mutate(|list| {

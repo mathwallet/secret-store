@@ -7,17 +7,17 @@ edition = "2018"
 
 [dependencies]
 # TODO: refer to crates.io version when it is published
-ethabi = { version = "11.0", git = "https://github.com/svyatonik/ethabi.git", rev = "fb5c9466aed2e4482f0065b2a44b900785a19578" }
-ethabi-contract = { version = "11.0", git = "https://github.com/svyatonik/ethabi.git", rev = "fb5c9466aed2e4482f0065b2a44b900785a19578" }
-ethabi-derive = { version = "11.0", git = "https://github.com/svyatonik/ethabi.git", rev = "fb5c9466aed2e4482f0065b2a44b900785a19578" }
+ethabi = { version = "14.0", git = "https://github.com/rust-ethereum/ethabi" }
+ethabi-contract = { version = "11.0", git = "https://github.com/rust-ethereum/ethabi" }
+ethabi-derive = { version = "14.0", git = "https://github.com/rust-ethereum/ethabi" }
 
-ethereum-types = "0.9"
+ethereum-types = "0.11"
 futures = "0.3"
-keccak-hash = "0.5"
+keccak-hash = "0.7"
 lazy_static = "1.4"
 log = "0.4"
 parking_lot = "0.10"
 parity-bytes = "0.1"
-parity-crypto = { version = "0.6", features = ["publickey"] }
+parity-crypto = { version = "0.8", features = ["publickey"] }
 blockchain-service = { package = "parity-secretstore-blockchain-service", path = "../blockchain-service" }
 primitives = { package = "parity-secretstore-primitives", path = "../primitives" }

@@ -30,6 +30,7 @@ use crate::{
 pub fn start(
 	executor: TokioHandle,
 	key_server_key_pair: Arc<dyn KeyServerKeyPair>,
+	listen_host: String,
 	listen_port: u16,
 	key_storage: Arc<PersistentKeyStorage>,
 	acl_storage: Arc<OnChainAclStorage>,
@@ -47,7 +48,7 @@ pub fn start(
 		.build_for_tcp(
 			executor,
 			key_server::network::tcp::NodeAddress {
-				address: "127.0.0.1".into(),
+				address: listen_host.into(),
 				port: listen_port,
 			},
 			key_server_set,

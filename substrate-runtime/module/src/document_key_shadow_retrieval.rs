@@ -24,7 +24,7 @@ use sp_std::vec::Vec;
 use frame_system::ensure_signed;
 use crate::service::{Responses, ResponseSupport, SecretStoreService};
 use super::{
-	Trait, Module, Event,
+	Config, Module, Event,
 	DocumentKeyShadowRetrievalFee,
 	DocumentKeyShadowRetrievalRequestsKeys, DocumentKeyShadowRetrievalRequests,
 	DocumentKeyShadowRetrievalCommonResponses, DocumentKeyShadowRetrievalPersonalResponses,
@@ -69,7 +69,7 @@ pub struct DocumentKeyShadowRetrievalPersonalData {
 /// Implementation of document key shadow retrieval service.
 pub struct DocumentKeyShadowRetrievalService<T>(sp_std::marker::PhantomData<T>);
 
-impl<T: Trait> DocumentKeyShadowRetrievalService<T> {
+impl<T: Config> DocumentKeyShadowRetrievalService<T> {
 	/// Request new document key shadow retrieval. Retrieved key will be published via
 	/// DocumentKeyShadowRetrieved event when available.
 	pub fn retrieve(
@@ -79,7 +79,7 @@ impl<T: Trait> DocumentKeyShadowRetrievalService<T> {
 	) -> Result<(), &'static str> {
 		// limit number of requests in the queue
 		ensure!(
-			(DocumentKeyShadowRetrievalRequestsKeys::decode_len()? as u64) < MAX_REQUESTS,
+			(DocumentKeyShadowRetrievalRequestsKeys::decode_len().unwrap_or(0) as u64) < MAX_REQUESTS,
 			"Too many active requests. Try later",
 		);
 
@@ -131,7 +131,7 @@ impl<T: Trait> DocumentKeyShadowRetrievalService<T> {
 			personal_retrieval_errors_count: 0,
 		};
 		DocumentKeyShadowRetrievalRequests::<T>::insert(retrieval_id, request);
-		DocumentKeyShadowRetrievalRequestsKeys::append(sp_std::iter::once(&retrieval_id))?;
+		DocumentKeyShadowRetrievalRequestsKeys::append(&retrieval_id);
 
 		// emit event
 		Module::<T>::deposit_event(Event::DocumentKeyShadowRetrievalRequested(id, requester));
@@ -353,7 +353,7 @@ impl<T: Trait> DocumentKeyShadowRetrievalService<T> {
 }
 
 /// Deletes request and all associated data.
-fn delete_request<T: Trait>(request: &(ServerKeyId, EntityId)) {
+fn delete_request<T: Config>(request: &(ServerKeyId, EntityId)) {
 	DocumentKeyShadowRetrievalCommonResponses::remove_prefix(request);
 	DocumentKeyShadowRetrievalPersonalResponses::remove_prefix(request);
 	DocumentKeyShadowRetrievalRequests::<T>::remove(request);

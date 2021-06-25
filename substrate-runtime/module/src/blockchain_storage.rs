@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity Secret Store.  If not, see <http://www.gnu.org/licenses/>.
 
-use crate::{Event, Module, Trait};
+use crate::{Event, Module, Config};
 use sp_std::marker::PhantomData;
 
 /// Blockchain related data storage.
@@ -31,8 +31,8 @@ pub(crate) trait Storage {
 /// The storage of single key server set.
 pub(crate) struct RuntimeStorage<T>(PhantomData<T>);
 
-impl<T: Trait> Storage for RuntimeStorage<T> {
-	type BlockNumber = <T as frame_system::Trait>::BlockNumber;
+impl<T: Config> Storage for RuntimeStorage<T> {
+	type BlockNumber = <T as frame_system::Config>::BlockNumber;
 
 	fn current_block_number(&self) -> Self::BlockNumber {
 		<frame_system::Module<T>>::block_number()

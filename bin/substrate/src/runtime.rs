@@ -21,6 +21,7 @@
 use codec::Encode;
 use sp_core::crypto::Pair as _;
 use sp_runtime::traits::{IdentifyAccount, NumberFor};
+use sp_runtime::generic;
 
 /// System::events storage key. Calculated as:
 /// twox_128(b"System").to_vec() ++ twox_128(b"Events").to_vec()
@@ -43,7 +44,7 @@ pub type SecretStoreCall = substrate_runtime::SecretStoreCall<Runtime>;
 /// Runtime itself.
 pub type Runtime = substrate_runtime::Runtime;
 /// Signed payload of the runtime.
-pub type SignedPayload = substrate_runtime::SignedPayload;
+pub type SignedPayload = generic::SignedPayload<Call, SignedExtra>;
 /// Unchecked extrinsic of the runtime.
 pub type UncheckedExtrinsic = substrate_runtime::UncheckedExtrinsic;
 
@@ -59,6 +60,16 @@ pub type Pair = sp_core::sr25519::Pair;
 
 /// Transaction status.
 pub type TransactionStatus = sp_transaction_pool::TransactionStatus<TransactionHash, BlockHash>;
+
+pub type SignedExtra = (
+	frame_system::CheckSpecVersion<Runtime>,
+	frame_system::CheckTxVersion<Runtime>,
+	frame_system::CheckGenesis<Runtime>,
+	frame_system::CheckEra<Runtime>,
+	frame_system::CheckNonce<Runtime>,
+	frame_system::CheckWeight<Runtime>,
+	pallet_transaction_payment::ChargeTransactionPayment<Runtime>
+);
 
 /// Create signer from given SURI and password.
 pub fn create_transaction_signer(
@@ -76,10 +87,12 @@ pub fn create_transaction(
 	index: Index,
 	genesis_hash: BlockHash,
 	runtime_version: u32,
+	transaction_version: u32,
 ) -> UncheckedExtrinsic {
 	let extra = |i: Index, f: Balance| {
 		(
-			frame_system::CheckVersion::<Runtime>::new(),
+			frame_system::CheckSpecVersion::<Runtime>::new(),
+			frame_system::CheckTxVersion::<Runtime>::new(),
 			frame_system::CheckGenesis::<Runtime>::new(),
 			frame_system::CheckEra::<Runtime>::from(sp_runtime::generic::Era::Immortal),
 			frame_system::CheckNonce::<Runtime>::from(i),
@@ -92,6 +105,7 @@ pub fn create_transaction(
 		extra(index, 0),
 		(
 			runtime_version,
+			transaction_version,
 			genesis_hash,
 			genesis_hash,
 			(),

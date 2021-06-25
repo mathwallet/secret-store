@@ -23,7 +23,7 @@ use primitives::{KeyServerId, ServerKeyId};
 use frame_system::ensure_signed;
 use crate::service::{Responses, ResponseSupport, SecretStoreService};
 use super::{
-	Trait, Module, Event,
+	Config, Module, Event,
 	ServerKeyRetrievalFee,
 	ServerKeyRetrievalRequests, ServerKeyRetrievalRequestsKeys,
 	ServerKeyRetrievalResponses, ServerKeyRetrievalThresholdResponses,
@@ -49,7 +49,7 @@ pub struct ServerKeyRetrievalRequest<Number> {
 /// Implementation of server key retrieval service.
 pub struct ServerKeyRetrievalService<T>(sp_std::marker::PhantomData<T>);
 
-impl<T: Trait> ServerKeyRetrievalService<T> {
+impl<T: Config> ServerKeyRetrievalService<T> {
 	/// Request new server key retrieval. Retrieved key will be published via ServerKeyRetrieved event when available.
 	pub fn retrieve(
 		origin: T::Origin,
@@ -57,7 +57,7 @@ impl<T: Trait> ServerKeyRetrievalService<T> {
 	) -> Result<(), &'static str> {
 		// limit number of requests in the queue
 		ensure!(
-			(ServerKeyRetrievalRequestsKeys::decode_len()? as u64) < MAX_REQUESTS,
+			(ServerKeyRetrievalRequestsKeys::decode_len().unwrap_or(0) as u64) < MAX_REQUESTS,
 			"Too many active requests. Try later",
 		);
 
@@ -84,7 +84,7 @@ impl<T: Trait> ServerKeyRetrievalService<T> {
 			server_key_with_max_threshold: Default::default(),
 		};
 		ServerKeyRetrievalRequests::<T>::insert(id, request);
-		ServerKeyRetrievalRequestsKeys::append(sp_std::iter::once(&id))?;
+		ServerKeyRetrievalRequestsKeys::append(&id);
 
 		// emit event
 		Module::<T>::deposit_event(Event::ServerKeyRetrievalRequested(id));
@@ -194,11 +194,11 @@ impl<T: Trait> ServerKeyRetrievalService<T> {
 	fn insert_response(
 		origin: T::Origin,
 		id: ServerKeyId,
-		mut request: ServerKeyRetrievalRequest<<T as frame_system::Trait>::BlockNumber>,
+		mut request: ServerKeyRetrievalRequest<<T as frame_system::Config>::BlockNumber>,
 		server_key_public: sp_core::H512,
 		threshold: u8,
 	) -> Result<(
-		ServerKeyRetrievalRequest<<T as frame_system::Trait>::BlockNumber>,
+		ServerKeyRetrievalRequest<<T as frame_system::Config>::BlockNumber>,
 		ResponseSupport,
 		sp_core::H512
 	), &'static str> {
@@ -248,7 +248,7 @@ impl<T: Trait> ServerKeyRetrievalService<T> {
 }
 
 /// Deletes request and all associated data.
-fn delete_request<T: Trait>(request: &ServerKeyId) {
+fn delete_request<T: Config>(request: &ServerKeyId) {
 	ServerKeyRetrievalResponses::remove_prefix(request);
 	ServerKeyRetrievalThresholdResponses::remove_prefix(request);
 	ServerKeyRetrievalRequests::<T>::remove(request);

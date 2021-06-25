@@ -162,6 +162,7 @@ async fn start_key_server(
 	let key_server = key_server::start(
 		tokio_runtime.executor(),
 		key_server_key_pair.clone(),
+		arguments.net_host,
 		arguments.net_port,
 		key_storage.clone(),
 		acl_storage.clone(),
