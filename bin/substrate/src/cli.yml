@@ -1,5 +1,5 @@
 name: parity-secretstore-substrate
-version: "0.1.0"
+version: "0.1.1"
 author: Parity Technologies <admin@parity.io>
 about: Parity Secret Store for Substrate
 args:

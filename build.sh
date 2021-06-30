@@ -19,8 +19,8 @@
 # along with Darwinia.  If not, see <https://www.gnu.org/licenses/>.
 
 echo -e '\e[1;32m🔧 Building Docker Image(s)\e[0m'
-docker build -f docker/Dockerfile.x86_64-linux-gnu -t x86_64-linux-gnu . #&> /dev/null
-docker build -f docker/Dockerfile.aarch64-linux-gnu -t aarch64-linux-gnu . #&> /dev/null
+docker build -f docker/Dockerfile.x86_64-linux-gnu -t secret-store-x86_64-linux-gnu . #&> /dev/null
+docker build -f docker/Dockerfile.aarch64-linux-gnu -t secret-store-aarch64-linux-gnu . #&> /dev/null
 
 echo -e '\e[1;32m📥 Installing Cross Compile Toolchain(s)\e[0m'
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal --default-toolchain nightly-2021-06-09 #&> /dev/null
